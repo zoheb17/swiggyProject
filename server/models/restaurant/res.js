@@ -1,0 +1,76 @@
+import mongoose from "mongoose";
+
+const restSchema = new mongoose.Schema({
+    restaurantName:{
+        type:String,
+        required:true,
+        trim:true
+    },
+    location:{
+        type:String,
+        required:true,
+        trim:true
+    },
+    email:{
+        type:String,
+        required:true,
+        unique:true,
+        lowercase:true,
+        trim:true,
+    },
+    password:{
+        type:String,
+        required:true,
+        trim:true
+    },
+    phone:{
+        type:String,
+        required:true,
+        unique:true,
+        trim:true
+    },
+    menu:[
+        {
+            itemName:{
+                type:String,
+            },
+            itemPrice:{
+                type:Number,
+            }
+        }
+    ],
+    isVerified:{
+        email:{
+            type:Boolean,
+            default:false
+        },
+        phone:{
+            type:Boolean,
+            default:false
+        }
+    },
+    verifyToken:{
+        emailToken:{
+            type:String,
+            default:null
+        },
+        phoneToken:{
+            type:String,
+            default:null
+        }
+    },
+    isOpen:{
+        type:Boolean,
+        default:false
+    },
+    role:{
+        type:String,
+        default:"Restaurant"
+    }
+},{
+    timestamps:true,
+    strict:false
+})
+
+const restaurantModel = mongoose.model("restaurants",restSchema)
+export default restaurantModel
