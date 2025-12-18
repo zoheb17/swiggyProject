@@ -24,9 +24,9 @@ app.get("/",(req,res)=>{
     }
 })
 app.use("/user", router);
-app.use("/public",riderRouter)
-app.use("/public",restaurantRouter)
-app.use(authmiddleware)
+app.use("/rider",riderRouter)
+app.use("/rest",restaurantRouter)
+app.use(authmiddleware) 
 app.use("/private",privateRouter) 
 app.use("/private",privateriderRouter)
 app.use("/private",privaterestaurantrouter)

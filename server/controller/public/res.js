@@ -26,9 +26,9 @@ router.post("/res-register", async (req, res) => {
       location,
       phone,
       password: hashPass,
-      isVerifiedToken: {
-        email: emailToken,
-        phone: phoneToken,
+      verifyToken: {
+        emailToken,
+         phoneToken,
       },
     };
     await restaurantModel.create(finalDbobject);
@@ -43,7 +43,7 @@ router.post("/res-register", async (req, res) => {
       `please verify link ${email}`
     );
 
-    await sendSMS(phone, `pleasse click the link below ${phoneurl}`);
+    // await sendSMS(phone, `pleasse click the link below ${phoneurl}`);
     res.status(201).json({ msg: `restaurant Account register  sucessfully` });
   } catch (error) {
     console.log(error);
@@ -59,15 +59,16 @@ router.get("/verify/:emailToken", async (req, res) => {
     if (!emailToken) {
       return res.status(400).json({ msg: "no token" });
     }
-    let user = await restaurantModel.findOne({ "isVerifiedToken.email": emailToken });
-    if (!user) {
-      res.status(400).json({ msg: "invalid token or no restuarant  found" });
-    }
+    let user = await restaurantModel.findOne({ "verifyToken.emailToken": emailToken });
+
     user.isVerified.email = true;
-    user.isVerifiedToken.email = null;
+    user.verifyToken.emailToken = null;
     await user.save();
     res.status(200).json({ msg: "email registered done" });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({msg:error})
+  }
 });
 
 router.get("/ph/:phoneToken", async (req, res) => {
@@ -77,13 +78,15 @@ router.get("/ph/:phoneToken", async (req, res) => {
     if (!phoneToken) {
       return res.status(400).json({ msg: "no token" });
     }
-    let user = await restaurantModel.findOne({ "isVerifiedToken.phone": phoneToken });
-    if (!user) {
-      res.status(400).json({ msg: "invalid token or no restuarant  found" });
+    let user = await restaurantModel.findOne({"verifyToken.phoneToken" : phoneToken})
+    if(!user){
+
+      return res.status(400).json({msg : "invalid link"})
     }
-    user.isVerified.phone = true;
-    user.isVerifiedToken.phone = null;
-    await user.save();
+    await restaurantModel.updateOne({"verifyToken.phoneToken" : phoneToken},
+      {$set : {"verifyToken.phoneToken" : null,"isVerified.phone" : true }}
+    )
+
     res.status(200).json({ msg: "phone registered done" });
   } catch (error) {
     console.log(error);
@@ -94,13 +97,11 @@ router.get("/ph/:phoneToken", async (req, res) => {
 
 
 
-router.post("/login", async (req, res) => {
+router.post("/res-login", async (req, res) => {
   try {
     let { email, password } = req.body;
     let user = await restaurantModel.findOne({ email });
-    if(!user.isActive){
-        return res.status(400).json({msg:"account delete"})
-    }
+   
     let hashPass = await bcrypt.compare(password, user.password);
     if (!hashPass) {
       return res.status(404).json({ msg: "resturant  not  found " });
@@ -117,4 +118,11 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ msg: error });
   }
 });
+
+
+
+
+
+
+
 export default router;

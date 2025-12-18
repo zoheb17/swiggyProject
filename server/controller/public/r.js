@@ -117,7 +117,8 @@ router.post("/login", async (req, res) => {
       id: user._id,
     };
     let token = await jwt.sign(playload, process.env.SECKEY);
-    res.status(200).json({ msg: "login done ", token });
+    await riderModel.updateOne({email:user.email},{$set:{isOnline:true}})
+    res.status(200).json({ msg: "login done ", token });       
   } catch (error) {
     console.log(error);
     res.status(500).json({ msg: error });

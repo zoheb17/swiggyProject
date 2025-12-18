@@ -1,6 +1,13 @@
 import mongoose from "mongoose";
 
 const restSchema = new mongoose.Schema({
+
+          restaurant_id:{
+            type:String,
+            require:true
+          },
+
+
     restaurantName:{
         type:String,
         required:true,
@@ -29,16 +36,7 @@ const restSchema = new mongoose.Schema({
         unique:true,
         trim:true
     },
-    menu:[
-        {
-            itemName:{
-                type:String,
-            },
-            itemPrice:{
-                type:Number,
-            }
-        }
-    ],
+   
     isVerified:{
         email:{
             type:Boolean,
